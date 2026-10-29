@@ -1,0 +1,12 @@
+[submodule "packages/lib-auth"]
+	path = packages/lib-auth
+	url = https://github.com/apps-home/lib-auth
+	branch = main
+[submodule "packages/lib-ui"]
+	path = packages/lib-ui
+	url = https://github.com/apps-home/lib-ui
+	branch = main
+[submodule "packages/lib-my-car-tracker-db"]
+	path = packages/lib-my-car-tracker-db
+	url = https://github.com/apps-home/lib-my-car-tracker-db
+	branch = main
