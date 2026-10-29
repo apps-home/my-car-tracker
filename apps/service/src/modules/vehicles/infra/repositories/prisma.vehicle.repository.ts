@@ -34,6 +34,18 @@ export class PrismaVehicleRepository implements VehicleRepository {
     return vehicles.map(PrismaVehicleMapper.toDomain)
   }
 
+  async findManyByIdsForSystem(ids: string[]): Promise<Vehicle[]> {
+    if (!ids.length) {
+      return []
+    }
+
+    const vehicles = await this.prisma.vehicle.findMany({
+      where: { id: { in: ids } }
+    })
+
+    return vehicles.map(PrismaVehicleMapper.toDomain)
+  }
+
   async create(vehicle: Vehicle): Promise<void> {
     await this.prisma.vehicle.create({
       data: PrismaVehicleMapper.toPrisma(vehicle)

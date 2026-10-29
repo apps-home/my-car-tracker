@@ -158,6 +158,33 @@ describe('Users (E2E)', () => {
     expect(response.body.message).toBe('User not found.')
   })
 
+  it('PATCH /users/:id/upload-avatar — should store an image and reject other types', async () => {
+    const rawUser = makeRawUser()
+
+    mockPrismaAuth.user.findUnique.mockResolvedValue(rawUser)
+
+    const rejected = await api
+      .patch(`/users/${rawUser.id}/upload-avatar`)
+      .attach('file', Buffer.from('not an image'), {
+        filename: 'avatar.txt',
+        contentType: 'text/plain'
+      })
+    expect(rejected.status).toBe(400)
+
+    const response = await api
+      .patch(`/users/${rawUser.id}/upload-avatar`)
+      .attach('file', Buffer.from('fake-png'), {
+        filename: 'avatar.png',
+        contentType: 'image/png'
+      })
+
+    expect(response.status).toBe(200)
+    expect(response.body.file_name).toMatch(
+      new RegExp(`^${rawUser.id}-\\d+\\.png$`)
+    )
+    expect(fakeStorage.files.size).toBe(1)
+  })
+
   it('GET /users/:id/download-avatar — should stream avatar file when found', async () => {
     const rawUser = makeRawUser()
 

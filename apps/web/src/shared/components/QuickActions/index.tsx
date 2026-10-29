@@ -8,10 +8,11 @@ import { useState } from 'react'
 
 import { ExpenseFormDialog } from '@/features/expenses/components/ExpenseFormDialog'
 import { FuelLogFormDialog } from '@/features/fuel-logs/components/FuelLogFormDialog'
+import { MaintenanceFormDialog } from '@/features/maintenances/components/MaintenanceFormDialog'
 import { useActiveVehicle } from '@/features/vehicles/hooks/use-active-vehicle'
 import { ResponsiveDialog } from '@/shared/components/ResponsiveDialog'
 
-type QuickAction = 'menu' | 'fuel' | 'expense' | null
+type QuickAction = 'menu' | 'fuel' | 'expense' | 'maintenance' | null
 
 const ACTION_CLASSES =
   'flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
@@ -72,13 +73,19 @@ export function QuickActions() {
                 </span>
               </span>
             </button>
-            <button type="button" className={ACTION_CLASSES} disabled>
-              <Wrench className="size-5 text-muted-foreground" />
+            <button
+              type="button"
+              className={ACTION_CLASSES}
+              onClick={() => setAction('maintenance')}
+            >
+              <Wrench className="size-5 text-primary" />
               <span>
                 <span className="block font-medium text-sm">
                   Manutenção / oficina
                 </span>
-                <span className="text-muted-foreground text-xs">Em breve</span>
+                <span className="text-muted-foreground text-xs">
+                  Peças, mão de obra, nota fiscal e planos cumpridos
+                </span>
               </span>
             </button>
           </div>
@@ -110,6 +117,11 @@ export function QuickActions() {
             onOpenChange={(open) => !open && setAction(null)}
             vehicle={vehicle}
             defaultCategory="TOLL"
+          />
+          <MaintenanceFormDialog
+            open={action === 'maintenance'}
+            onOpenChange={(open) => !open && setAction(null)}
+            vehicle={vehicle}
           />
         </>
       )}

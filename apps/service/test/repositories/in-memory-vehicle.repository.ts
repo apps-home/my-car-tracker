@@ -23,6 +23,10 @@ export class InMemoryVehicleRepository implements VehicleRepository {
       )
   }
 
+  async findManyByIdsForSystem(ids: string[]): Promise<Vehicle[]> {
+    return this.items.filter((item) => ids.includes(item.id))
+  }
+
   async create(vehicle: Vehicle): Promise<void> {
     this.items.push(vehicle)
   }

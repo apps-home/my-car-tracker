@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { SCHEDULES_QUERY_KEY } from '@/features/schedules/hooks/use-schedules'
 import { VEHICLES_QUERY_KEY } from '@/features/vehicles/hooks/use-vehicles'
 import { queryClient } from '@/shared/providers/query-client'
 
@@ -20,10 +21,11 @@ import type {
 
 export const EXPENSES_QUERY_KEY = 'expenses'
 
-/** Uma despesa com km pode subir o odômetro do veículo */
+/** Uma despesa com km pode subir o odômetro do veículo (e mudar os planos) */
 function invalidateAfterWrite() {
   queryClient.invalidateQueries({ queryKey: [EXPENSES_QUERY_KEY] })
   queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
+  queryClient.invalidateQueries({ queryKey: [SCHEDULES_QUERY_KEY] })
 }
 
 export function useExpenses(params?: ListExpensesParams, enabled = true) {

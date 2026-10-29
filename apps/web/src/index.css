@@ -2,7 +2,8 @@
 
 /*
  * Séries dos gráficos de custo (paleta categórica validada para daltonismo,
- * na ordem fixa: combustível, pedágio/estacionamento, impostos/seguro, outras).
+ * na ordem fixa: combustível, pedágio/estacionamento, impostos/seguro, outras,
+ * manutenção).
  * O modo escuro usa os mesmos tons ajustados para a superfície escura.
  */
 :root {
@@ -10,6 +11,7 @@
   --series-2: #eb6834;
   --series-3: #1baf7a;
   --series-4: #eda100;
+  --series-5: #e87ba4;
 }
 
 .dark {
@@ -17,4 +19,5 @@
   --series-2: #d95926;
   --series-3: #199e70;
   --series-4: #c98500;
+  --series-5: #d55181;
 }

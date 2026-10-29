@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { SCHEDULES_QUERY_KEY } from '@/features/schedules/hooks/use-schedules'
 import { VEHICLES_QUERY_KEY } from '@/features/vehicles/hooks/use-vehicles'
 import { queryClient } from '@/shared/providers/query-client'
 
@@ -20,10 +21,11 @@ import type {
 
 export const FUEL_LOGS_QUERY_KEY = 'fuel-logs'
 
-/** Um abastecimento muda o consumo dos vizinhos e o km do veículo */
+/** Um abastecimento muda o consumo dos vizinhos, o km do veículo e os planos */
 function invalidateAfterWrite() {
   queryClient.invalidateQueries({ queryKey: [FUEL_LOGS_QUERY_KEY] })
   queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
+  queryClient.invalidateQueries({ queryKey: [SCHEDULES_QUERY_KEY] })
 }
 
 export function useFuelLogs(params?: ListFuelLogsParams, enabled = true) {

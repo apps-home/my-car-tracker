@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle
 } from '@lib/ui/components/card'
-import { Fuel } from 'lucide-react'
+import { Fuel, Wrench } from 'lucide-react'
 
 import type { Expense } from '@/features/expenses/api/types'
 import {
@@ -12,6 +12,7 @@ import {
   EXPENSE_CATEGORY_LABELS
 } from '@/features/expenses/utils/category-labels'
 import type { FuelLog } from '@/features/fuel-logs/api/types'
+import type { Maintenance } from '@/features/maintenances/api/types'
 import { FUEL_TYPE_LABELS } from '@/features/vehicles/utils/fuel-type-labels'
 import { formatCurrency } from '@/shared/utils/format-currency'
 import { formatDate } from '@/shared/utils/format-date'
@@ -19,6 +20,7 @@ import { formatDate } from '@/shared/utils/format-date'
 interface RecentEntriesProps {
   fuelLogs: FuelLog[]
   expenses: Expense[]
+  maintenances?: Maintenance[]
   limit?: number
 }
 
@@ -35,6 +37,7 @@ interface Entry {
 export function RecentEntries({
   fuelLogs,
   expenses,
+  maintenances = [],
   limit = 6
 }: RecentEntriesProps) {
   const entries: Entry[] = [
@@ -55,6 +58,15 @@ export function RecentEntries({
       subtitle: EXPENSE_CATEGORY_LABELS[expense.category],
       amount: expense.amount,
       icon: EXPENSE_CATEGORY_ICONS[expense.category]
+    })),
+    ...maintenances.map((maintenance) => ({
+      id: maintenance.id,
+      date: maintenance.date,
+      createdAt: maintenance.createdAt,
+      title: maintenance.title,
+      subtitle: maintenance.workshopName ?? 'Manutenção',
+      amount: maintenance.totalAmount,
+      icon: Wrench
     }))
   ]
     .sort(

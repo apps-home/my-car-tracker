@@ -1,12 +1,14 @@
 import type { Expense, ExpenseCategory } from '@/features/expenses/api/types'
 import type { FuelLog } from '@/features/fuel-logs/api/types'
+import type { Maintenance } from '@/features/maintenances/api/types'
 import { MONTH_NAMES } from '@/shared/utils/month-names'
 
 export const COST_SERIES = [
   { key: 'fuel', label: 'Combustível', color: 'var(--series-1)' },
   { key: 'road', label: 'Pedágio e estacionamento', color: 'var(--series-2)' },
   { key: 'taxes', label: 'Impostos e seguro', color: 'var(--series-3)' },
-  { key: 'other', label: 'Outras', color: 'var(--series-4)' }
+  { key: 'other', label: 'Outras', color: 'var(--series-4)' },
+  { key: 'maintenance', label: 'Manutenção', color: 'var(--series-5)' }
 ] as const
 
 export type CostSeriesKey = (typeof COST_SERIES)[number]['key']
@@ -36,7 +38,8 @@ function monthOf(date: string) {
 /** Custos de cada mês do ano por série, com as datas já filtradas pelo ano */
 export function buildMonthlyCosts(
   fuelLogs: FuelLog[],
-  expenses: Expense[]
+  expenses: Expense[],
+  maintenances: Maintenance[] = []
 ): MonthlyCost[] {
   const months: MonthlyCost[] = MONTH_NAMES.map((name) => ({
     month: name.slice(0, 3),
@@ -44,7 +47,8 @@ export function buildMonthlyCosts(
     fuel: 0,
     road: 0,
     taxes: 0,
-    other: 0
+    other: 0,
+    maintenance: 0
   }))
 
   for (const fuelLog of fuelLogs) {
@@ -57,6 +61,12 @@ export function buildMonthlyCosts(
     const month = months[monthOf(expense.date)]
     month[CATEGORY_SERIES[expense.category]] += expense.amount
     month.total += expense.amount
+  }
+
+  for (const maintenance of maintenances) {
+    const month = months[monthOf(maintenance.date)]
+    month.maintenance += maintenance.totalAmount
+    month.total += maintenance.totalAmount
   }
 
   return months

@@ -3,6 +3,7 @@
 import { Skeleton } from '@lib/ui/components/skeleton'
 import { CalendarDays, Fuel, Gauge, Route } from 'lucide-react'
 
+import { MaintenanceAlertsCard } from '@/features/dashboard/components/MaintenanceAlertsCard'
 import { MonthlyCostChart } from '@/features/dashboard/components/MonthlyCostChart'
 import { RecentEntries } from '@/features/dashboard/components/RecentEntries'
 import { buildMonthlyCosts } from '@/features/dashboard/utils/monthly-costs'
@@ -12,6 +13,8 @@ import {
   useFuelLogSummary,
   useFuelLogs
 } from '@/features/fuel-logs/hooks/use-fuel-logs'
+import { useMaintenances } from '@/features/maintenances/hooks/use-maintenances'
+import { useSchedules } from '@/features/schedules/hooks/use-schedules'
 import { useActiveVehicle } from '@/features/vehicles/hooks/use-active-vehicle'
 import { NoVehicleState } from '@/shared/components/NoVehicleState'
 import { PageHeader } from '@/shared/components/PageHeader'
@@ -33,6 +36,12 @@ export default function DashboardClient() {
   )
   const { data: expenses = [], isLoading: isLoadingExpenses } = useExpenses(
     { vehicleId: vehicle?.id, year },
+    !!vehicle
+  )
+  const { data: maintenances = [], isLoading: isLoadingMaintenances } =
+    useMaintenances({ vehicleId: vehicle?.id, year }, !!vehicle)
+  const { data: schedules = [] } = useSchedules(
+    { vehicleId: vehicle?.id },
     !!vehicle
   )
   const { data: yearSummary } = useFuelLogSummary(
@@ -67,9 +76,10 @@ export default function DashboardClient() {
     )
   }
 
-  const monthlyCosts = buildMonthlyCosts(fuelLogs, expenses)
+  const monthlyCosts = buildMonthlyCosts(fuelLogs, expenses, maintenances)
   const currentMonth = monthlyCosts[month]
-  const isLoadingData = isLoadingFuel || isLoadingExpenses
+  const isLoadingData =
+    isLoadingFuel || isLoadingExpenses || isLoadingMaintenances
 
   return (
     <main className="container mx-auto flex flex-col gap-4 p-4 pb-24">
@@ -125,10 +135,17 @@ export default function DashboardClient() {
         <div className="lg:col-span-2">
           <MonthlyCostChart data={monthlyCosts} year={year} />
         </div>
-        <RecentEntries fuelLogs={fuelLogs} expenses={expenses} />
+        <RecentEntries
+          fuelLogs={fuelLogs}
+          expenses={expenses}
+          maintenances={maintenances}
+        />
       </div>
 
-      {allTimeSummary && <EthanolComparatorCard summary={allTimeSummary} />}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <MaintenanceAlertsCard schedules={schedules} />
+        {allTimeSummary && <EthanolComparatorCard summary={allTimeSummary} />}
+      </div>
     </main>
   )
 }

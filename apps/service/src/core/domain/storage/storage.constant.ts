@@ -4,6 +4,11 @@ export enum StorageBucket {
 
 export enum StorageFolder {
   PUBLIC = 'public',
+  /** Só por link assinado (notas fiscais e comprovantes) */
+  PRIVATE = 'private',
   USERS = 'users',
-  AVATARS = 'avatars'
+  AVATARS = 'avatars',
+  VEHICLES = 'vehicles',
+  MAINTENANCES = 'maintenances',
+  EXPENSES = 'expenses'
 }

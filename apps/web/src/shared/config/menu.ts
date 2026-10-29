@@ -1,4 +1,12 @@
-import { Car, Fuel, Home, type LucideIcon, Receipt } from 'lucide-react'
+import {
+  CalendarCheck,
+  Car,
+  Fuel,
+  Home,
+  type LucideIcon,
+  Receipt,
+  Wrench
+} from 'lucide-react'
 import type { Route } from 'next'
 
 export interface MenuLink {
@@ -19,11 +27,18 @@ export function isMenuGroup(entry: MenuEntry): entry is MenuGroup {
   return 'items' in entry
 }
 
-// Manutenções e planos preventivos entram aqui quando as features forem criadas
 export const headerMenu: MenuEntry[] = [
   { title: 'Painel', path: '/', icon: Home },
   { title: 'Abastecimentos', path: '/fuel-logs', icon: Fuel },
   { title: 'Despesas', path: '/expenses', icon: Receipt },
+  {
+    title: 'Oficina',
+    icon: Wrench,
+    items: [
+      { title: 'Manutenções', path: '/maintenances', icon: Wrench },
+      { title: 'Planos preventivos', path: '/schedules', icon: CalendarCheck }
+    ]
+  },
   { title: 'Veículos', path: '/vehicles', icon: Car }
 ]
 

@@ -47,7 +47,8 @@ export class UserController {
           return callback(new BadRequestException('Invalid file type'), false)
         }
 
-        if (typeof file.filename !== 'string') {
+        // No fileFilter o multer só tem fieldname, originalname, encoding e mimetype
+        if (typeof file.originalname !== 'string' || !file.originalname) {
           return callback(new BadRequestException('Invalid file name'), false)
         }
 

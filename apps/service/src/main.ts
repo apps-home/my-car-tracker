@@ -14,8 +14,7 @@ async function bootstrap() {
   const PORT = env.get('PORT')
 
   app.enableCors({
-    // Acrescente aqui o domínio de produção do web quando ele existir
-    origin: ['http://localhost:3000', 'http://local.dev.terraviva:3000'],
+    origin: env.get('CORS_ORIGINS'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
