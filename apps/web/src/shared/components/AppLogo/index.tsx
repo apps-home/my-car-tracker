@@ -8,7 +8,7 @@ interface AppLogoProps {
 }
 
 /**
- * Marca do My Car Tracker (provisória): barras ascendentes com a linha de tendência.
+ * Marca do My Car Tracker: carro de perfil sobre a estrada tracejada.
  * Também é usada pelo ImageResponse (ícones, favicon), por isso só usa SVG
  * com atributos simples.
  */
@@ -27,17 +27,17 @@ export function AppLogo({
       viewBox="0 0 24 24"
       fill={color}
     >
-      <rect x="3" y="15" width="4" height="6" rx="1.25" />
-      <rect x="10" y="12" width="4" height="9" rx="1.25" />
-      <rect x="17" y="9" width="4" height="12" rx="1.25" />
+      {/* Carroceria com as janelas vazadas (evenodd) e as rodas */}
       <path
-        d="M3 11.5 9 6.5 13 9 20.5 3M16 3h4.5v4.5"
-        fill="none"
-        stroke={color}
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        d="M3 14.9V11C3 10.3 3.4 9.8 4.1 9.6L7 8.8 9.3 5.7C9.7 5.2 10.2 4.9 10.9 4.9H14.6C15.3 4.9 15.9 5.2 16.3 5.8L18.6 8.8 20.2 9.3C20.9 9.5 21.3 10.1 21.3 10.8V14.9H19.6A2.6 2.6 0 0 0 14.4 14.9H9.6A2.6 2.6 0 0 0 4.4 14.9ZM9.9 8.6 11.2 6.4C11.4 6.1 11.6 6.1 11.9 6.1H12.6V8.6ZM13.6 6.1H14.3C14.6 6.1 14.8 6.2 15 6.4L16.6 8.6H13.6Z"
       />
+      <circle cx="7" cy="15.2" r="1.9" />
+      <circle cx="17" cy="15.2" r="1.9" />
+      {/* Estrada */}
+      <rect x="2" y="19.6" width="5.5" height="1.6" rx="0.8" />
+      <rect x="9.25" y="19.6" width="5.5" height="1.6" rx="0.8" />
+      <rect x="16.5" y="19.6" width="5.5" height="1.6" rx="0.8" />
     </svg>
   )
 }

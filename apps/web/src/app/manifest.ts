@@ -21,6 +21,20 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: APP_COLORS.background,
     theme_color: APP_COLORS.background,
     categories: ['productivity', 'utilities'],
+    shortcuts: [
+      {
+        name: 'Novo abastecimento',
+        short_name: 'Abastecer',
+        url: `${basePath}/fuel-logs?new=1`,
+        icons: [{ src: `${basePath}/icon/192`, sizes: '192x192' }]
+      },
+      {
+        name: 'Nova despesa',
+        short_name: 'Despesa',
+        url: `${basePath}/expenses?new=1`,
+        icons: [{ src: `${basePath}/icon/192`, sizes: '192x192' }]
+      }
+    ],
     icons: [
       {
         src: `${basePath}/icon/192`,

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import Header from '@/shared/components/Header'
+import { QuickActions } from '@/shared/components/QuickActions'
 
 export const metadata: Metadata = {
   title: 'My Car Tracker',
@@ -16,6 +17,7 @@ export default function Layout({
     <div className="grid min-h-svh grid-rows-[auto_1fr]">
       <Header />
       {children}
+      <QuickActions />
     </div>
   )
 }

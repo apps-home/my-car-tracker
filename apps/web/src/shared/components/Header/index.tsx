@@ -22,6 +22,7 @@ import { useState } from 'react'
 
 import { NotificationInbox } from '@/features/notifications/components/NotificationInbox'
 import { ProfileMenu } from '@/features/profile/components/ProfileMenu'
+import { VehicleSelector } from '@/features/vehicles/components/VehicleSelector'
 import { AppLogo } from '@/shared/components/AppLogo'
 import {
   headerMenu,
@@ -197,7 +198,8 @@ export default function Header() {
           )}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-2 sm:gap-4">
+            <VehicleSelector />
             <ModeToggle />
             <NotificationInbox />
             <ProfileMenu />

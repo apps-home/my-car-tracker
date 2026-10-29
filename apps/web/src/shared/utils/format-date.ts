@@ -10,3 +10,8 @@ export function formatDate(value: string | Date): string {
 export function toDateInputValue(value: string | Date): string {
   return new Date(value).toISOString().slice(0, 10)
 }
+
+/** Hoje no fuso do usuário, como YYYY-MM-DD (o dia que ele vê no celular) */
+export function todayDateInputValue(): string {
+  return new Date().toLocaleDateString('en-CA')
+}
