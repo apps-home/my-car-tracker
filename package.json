@@ -1,0 +1,49 @@
+{
+  "name": "my-car-tracker",
+  "version": "1.0.0",
+  "description": "My Car Tracker Monorepo (NestJS API + Next.js Web)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter api --filter web --parallel dev",
+    "dev:service": "pnpm --filter api dev",
+    "dev:web": "pnpm --filter web dev",
+    "build:service": "pnpm build:libs && pnpm --filter api build",
+    "build:web": "pnpm build:libs && pnpm --filter web build",
+    "build:db": "pnpm --filter @lib/my-car-tracker-db build",
+    "build:auth": "pnpm --filter @lib/auth build",
+    "build:libs": "pnpm build:db && pnpm build:auth",
+    "test": "pnpm --filter api test",
+    "test:cov": "pnpm --filter api test:cov",
+    "test:e2e": "pnpm --filter api test:e2e",
+    "lint": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "check-versions": "node scripts/check-version.mjs"
+  },
+  "dependencies": {
+    "@my-car-tracker/env": "workspace:*",
+    "@lib/my-car-tracker-db": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "~2.5.11",
+    "@my-car-tracker/config": "workspace:*",
+    "@types/node": "^25.5.0",
+    "typescript": "catalog:"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "@swc/core",
+      "msgpackr-extract",
+      "msw",
+      "prisma",
+      "sharp"
+    ]
+  },
+  "packageManager": "pnpm@11.0.9"
+}

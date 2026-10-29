@@ -1,0 +1,22 @@
+services:
+  api:
+    image: ghcr.io/${OWNER_REPO}/my-car-tracker-api:${IMAGE_TAG}
+    container_name: my-car-tracker-api
+    restart: unless-stopped
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=${PORT}
+      - DATABASE_URL
+      - R2_ACCOUNT_ID
+      - R2_ACCESS_KEY_ID
+      - R2_SECRET_ACCESS_KEY
+      - REDIS_HOST
+      - REDIS_PORT
+      - REDIS_PASSWORD
+    networks:
+      - public_network
+
+networks:
+  public_network:
+    external: true
