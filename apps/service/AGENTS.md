@@ -4,7 +4,7 @@
 
 API do **My Car Tracker**: centraliza as informações do automóvel do usuário (abastecimentos, despesas, manutenções e planos preventivos por tempo e quilometragem). O conceito completo, com o schema e as regras de negócio, está em `docs/CONCEPT.md`.
 
-Hoje a API tem a fundação (autenticação, módulo `user` com consulta e avatar, e a infraestrutura: Prisma, filas, cron, eventos, R2, n8n e Novu) e os módulos `vehicles`, `fuel-logs` e `expenses`. Os demais módulos do domínio entram pelo roteiro da seção 8 do conceito.
+Hoje a API contempla a fundação (autenticação, módulo `user` com consulta e avatar, e a infraestrutura: Prisma, filas, cron, eventos, R2, n8n e Novu) e todos os módulos do domínio automotivo: `vehicles`, `fuel-logs`, `expenses`, `maintenances`, `schedules` e `analytics`.
 
 ---
 
@@ -26,19 +26,21 @@ Hoje a API tem a fundação (autenticação, módulo `user` com consulta e avata
 
 ```
 modules/
-├── user/       # Usuário do Better Auth (consulta e avatar)
-├── vehicles/   # CRUD de veículos, ativação/inativação e SyncVehicleOdometerService
-├── fuel-logs/  # Abastecimentos, motor de consumo (domain/fuel-consumption.ts) com recálculo em cadeia e resumo
-└── expenses/   # Despesas (pedágio, IPVA, seguro...), busca e sugestões dos lançamentos repetidos
+├── user/         # Usuário do Better Auth (consulta e avatar)
+├── vehicles/     # CRUD de veículos, ativação/inativação e SyncVehicleOdometerService
+├── fuel-logs/    # Abastecimentos, motor de consumo (domain/fuel-consumption.ts) com recálculo em cadeia e resumo
+├── expenses/     # Despesas (pedágio, IPVA, seguro...), busca e sugestões dos lançamentos repetidos
+├── maintenances/ # Histórico de oficina, itens com garantia, anexo privado no R2 e renovação de planos (ScheduleExecutionService)
+├── schedules/    # Planos preventivos por tempo e km, templates padrão, cron diário e alertas via Novu/n8n
+└── analytics/    # Visão consolidada de TCO, custo total por km, participação por série e evolução mensal
 ```
-
-Previstos no conceito: `maintenances`, `schedules` e `analytics`.
 
 ### Regras já implementadas
 
 - **Odômetro:** todo lançamento com km chama `SyncVehicleOdometerService` (exportado pelo `VehicleModule`), que só avança o km do veículo e emite `vehicle.odometer-updated` (`DOMAIN_EVENTS` em `core/domain/events/event.constants.ts`). O km de um lançamento não pode ser menor que o `initialOdometerKm` do veículo.
 - **Consumo:** a cada criação, edição ou exclusão de abastecimento o motor roda sobre todos os registros do veículo (ordenados por km) e grava só os que mudaram (`saveConsumption`). Um tanque cheio fecha o período do tanque cheio anterior, somando os parciais. Nos abastecimentos, o km precisa crescer com a data (`findOdometerConflict`).
-- **Datas:** abastecimentos e despesas guardam o dia de calendário (00:00 UTC). O web envia `YYYY-MM-DD`; os filtros `from`/`to`/`year`/`month` (`PeriodQueryDTO` + `toDateRange`) são em UTC, com `to` inclusivo.
+- **Planos e manutenções:** itens de manutenção vinculados a um `scheduleId` renovam ou recalculam o plano via `ScheduleExecutionService`. Os planos são reavaliados quando o km do veículo sobe (`VehicleOdometerUpdatedListener`) e no cron diário às 08:00 `America/Sao_Paulo` (`EvaluateMaintenanceSchedulesCron`), disparando alerta no Novu e webhook do n8n apenas quando o status piora (`ON_TRACK` → `DUE_SOON` → `OVERDUE`).
+- **Datas:** abastecimentos, despesas e manutenções guardam o dia de calendário (00:00 UTC). O web envia `YYYY-MM-DD`; os filtros `from`/`to`/`year`/`month` (`PeriodQueryDTO` + `toDateRange`) são em UTC, com `to` inclusivo.
 - **Valores:** `Decimal` do Prisma vira `number` no mapper Prisma; a entidade arredonda (litros e preço com 3 casas, valores em R$ com 2).
 - **In-memory com cópias:** os repositórios in-memory de abastecimentos e despesas devolvem cópias, como o banco, para que um erro depois de `entity.update()` não altere `items`.
 
@@ -158,9 +160,12 @@ Todos exigem `Authorization: Bearer <session token>` e respondem apenas com dado
 | **Vehicles** | `POST /vehicles`, `GET /vehicles` (`?status=ACTIVE\|INACTIVE`), `GET/PATCH/DELETE /vehicles/:id` |
 | **Fuel Logs** | `POST /fuel-logs`, `GET /fuel-logs` (`vehicleId`, `fuelType`, `from`, `to`, `year`, `month`), `GET /fuel-logs/summary` (`vehicleId` obrigatório + período; totais, consumo por combustível e `ethanolParity`), `GET/PATCH/DELETE /fuel-logs/:id` |
 | **Expenses** | `POST /expenses`, `GET /expenses` (`vehicleId`, `category`, `search`, `from`, `to`, `year`, `month`), `GET /expenses/suggestions` (`vehicleId` obrigatório; repetidas dos últimos 180 dias), `GET/PATCH/DELETE /expenses/:id` |
+| **Maintenances** | `POST /maintenances`, `GET /maintenances` (`vehicleId`, `type`, `search`, `from`, `to`, `year`, `month`), `GET /maintenances/warranties` (`vehicleId`), `GET/PATCH/DELETE /maintenances/:id`, `POST /maintenances/:id/upload-invoice`, `GET /maintenances/:id/invoice` |
+| **Schedules** | `POST /schedules`, `POST /schedules/seed-defaults`, `GET /schedules/templates`, `GET /schedules` (`vehicleId`, `alertStatus`, `isActive`), `GET/PATCH/DELETE /schedules/:id` |
+| **Analytics** | `GET /analytics/overview` (`vehicleId` obrigatório + período; TCO, `totalCostPerKm`, `fuelCostPerKm`, `bySeries`, `byExpenseCategory`, `maintenanceBreakdown`), `GET /analytics/monthly-costs` (`vehicleId` obrigatório + `year`) |
 | **Notifications** | `GET /notifications/inbox-session` (credenciais do Inbox do Novu; `{ enabled: false }` sem Novu) |
 
-Os demais endpoints do domínio estão planejados na seção 6 do `docs/CONCEPT.md`. Criações respondem `{ message, id }`.
+Criações respondem `{ message, id }`.
 
 ### Passo a Passo para Criar um Novo Módulo
 

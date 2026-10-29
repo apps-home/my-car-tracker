@@ -11,6 +11,10 @@ export interface CreateFuelLogPayload {
   pricePerLiter: number
   /** Sem valor, é `liters * pricePerLiter` */
   totalCost?: number
+  /** Valor de ajuda / divisão de combustível recebida (default 0) */
+  reimbursedAmount?: number | null
+  /** Quem ajudou na divisão (ex.: "Pai, Mãe", "Annalik") */
+  sharedWith?: string | null
   isFullTank?: boolean
   gasStationName?: string | null
   paymentMethod?: PaymentMethod | null

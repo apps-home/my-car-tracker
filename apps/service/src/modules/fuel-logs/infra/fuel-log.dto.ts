@@ -51,6 +51,16 @@ export class CreateFuelLogDTO {
   totalCost?: number
 
   @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  reimbursedAmount?: number | null
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  sharedWith?: string | null
+
+  @IsOptional()
   @IsBoolean()
   isFullTank?: boolean
 

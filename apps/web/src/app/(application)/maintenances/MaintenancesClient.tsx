@@ -16,10 +16,12 @@ import {
 } from '@/features/maintenances/api/types'
 import { MaintenanceFormDialog } from '@/features/maintenances/components/MaintenanceFormDialog'
 import { MaintenanceList } from '@/features/maintenances/components/MaintenanceList'
+import { MaintenanceTasksCard } from '@/features/maintenances/components/MaintenanceTasksCard'
 import { WarrantiesCard } from '@/features/maintenances/components/WarrantiesCard'
 import {
   useActiveWarranties,
   useDeleteMaintenance,
+  useMaintenanceTasks,
   useMaintenances
 } from '@/features/maintenances/hooks/use-maintenances'
 import { MAINTENANCE_TYPE_LABELS } from '@/features/maintenances/utils/maintenance-labels'
@@ -74,6 +76,7 @@ export default function MaintenancesClient() {
     !!vehicle
   )
   const { data: warranties = [] } = useActiveWarranties(vehicle?.id)
+  const { data: tasks = [] } = useMaintenanceTasks(vehicle?.id)
   const { mutateAsync: deleteMaintenance, isPending: isDeleting } =
     useDeleteMaintenance()
 
@@ -160,7 +163,10 @@ export default function MaintenancesClient() {
             />
           )}
         </div>
-        <WarrantiesCard warranties={warranties} />
+        <div className="flex flex-col gap-4">
+          <MaintenanceTasksCard vehicleId={vehicle.id} tasks={tasks} />
+          <WarrantiesCard warranties={warranties} />
+        </div>
       </div>
 
       <MaintenanceFormDialog

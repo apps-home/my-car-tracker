@@ -18,18 +18,25 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { toHttpException } from '@/infra/http/to-http-exception'
 
 import { CreateMaintenanceUseCase } from '../application/use-cases/create-maintenance'
+import { CreateMaintenanceTaskUseCase } from '../application/use-cases/create-maintenance-task'
 import { DeleteMaintenanceUseCase } from '../application/use-cases/delete-maintenance'
+import { DeleteMaintenanceTaskUseCase } from '../application/use-cases/delete-maintenance-task'
 import { FindMaintenanceByIdUseCase } from '../application/use-cases/find-maintenance'
 import { GetInvoiceUrlUseCase } from '../application/use-cases/get-invoice-url'
 import { ListActiveWarrantiesUseCase } from '../application/use-cases/list-active-warranties'
+import { ListMaintenanceTasksUseCase } from '../application/use-cases/list-maintenance-tasks'
 import { ListMaintenancesUseCase } from '../application/use-cases/list-maintenances'
 import { UpdateMaintenanceUseCase } from '../application/use-cases/update-maintenance'
+import { UpdateMaintenanceTaskUseCase } from '../application/use-cases/update-maintenance-task'
 import { UploadInvoiceUseCase } from '../application/use-cases/upload-invoice'
 import {
   CreateMaintenanceDTO,
+  CreateMaintenanceTaskDTO,
   ListMaintenancesQueryDTO,
+  ListMaintenanceTasksQueryDTO,
   ListWarrantiesQueryDTO,
-  UpdateMaintenanceDTO
+  UpdateMaintenanceDTO,
+  UpdateMaintenanceTaskDTO
 } from './maintenance.dto'
 
 /** Foto (celular) ou PDF da nota fiscal / OS */
@@ -47,7 +54,11 @@ export class MaintenanceController {
     private readonly updateMaintenanceUseCase: UpdateMaintenanceUseCase,
     private readonly deleteMaintenanceUseCase: DeleteMaintenanceUseCase,
     private readonly uploadInvoiceUseCase: UploadInvoiceUseCase,
-    private readonly getInvoiceUrlUseCase: GetInvoiceUrlUseCase
+    private readonly getInvoiceUrlUseCase: GetInvoiceUrlUseCase,
+    private readonly createMaintenanceTaskUseCase: CreateMaintenanceTaskUseCase,
+    private readonly listMaintenanceTasksUseCase: ListMaintenanceTasksUseCase,
+    private readonly updateMaintenanceTaskUseCase: UpdateMaintenanceTaskUseCase,
+    private readonly deleteMaintenanceTaskUseCase: DeleteMaintenanceTaskUseCase
   ) {}
 
   @Post()
@@ -88,6 +99,69 @@ export class MaintenanceController {
     })
 
     return result.value
+  }
+
+  @Get('tasks')
+  async listTasks(
+    @Query() query: ListMaintenanceTasksQueryDTO,
+    @CurrentUserId() userId: string
+  ) {
+    const result = await this.listMaintenanceTasksUseCase.execute({
+      ...query,
+      userId
+    })
+
+    return result.value
+  }
+
+  @Post('tasks')
+  async createTask(
+    @Body() data: CreateMaintenanceTaskDTO,
+    @CurrentUserId() userId: string
+  ) {
+    const result = await this.createMaintenanceTaskUseCase.execute(userId, data)
+
+    if (result.isLeft()) {
+      throw toHttpException(result.value)
+    }
+
+    return {
+      message: 'Maintenance task created successfully',
+      id: result.value.id
+    }
+  }
+
+  @Patch('tasks/:id')
+  async updateTask(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() data: UpdateMaintenanceTaskDTO,
+    @CurrentUserId() userId: string
+  ) {
+    const result = await this.updateMaintenanceTaskUseCase.execute(
+      userId,
+      id,
+      data
+    )
+
+    if (result.isLeft()) {
+      throw toHttpException(result.value)
+    }
+
+    return { message: 'Maintenance task updated successfully' }
+  }
+
+  @Delete('tasks/:id')
+  async deleteTask(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @CurrentUserId() userId: string
+  ) {
+    const result = await this.deleteMaintenanceTaskUseCase.execute(userId, id)
+
+    if (result.isLeft()) {
+      throw toHttpException(result.value)
+    }
+
+    return { message: 'Maintenance task deleted successfully' }
   }
 
   @Get(':id')

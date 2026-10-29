@@ -19,6 +19,8 @@ export interface FuelTotals {
   count: number
   totalLiters: number
   totalCost: number
+  totalReimbursed: number
+  netCost: number
   averagePricePerLiter: number | null
   /** Km dos períodos fechados por tanque cheio */
   distanceKm: number
@@ -120,6 +122,7 @@ export class GetFuelLogSummaryUseCase {
 function totals(entries: Entry[]): FuelTotals {
   let totalLiters = 0
   let totalCost = 0
+  let totalReimbursed = 0
   let distanceKm = 0
   let periodLiters = 0
   let periodCost = 0
@@ -127,6 +130,7 @@ function totals(entries: Entry[]): FuelTotals {
   for (const { fuelLog, consumption } of entries) {
     totalLiters += fuelLog.liters
     totalCost += fuelLog.totalCost
+    totalReimbursed += fuelLog.reimbursedAmount
 
     if (consumption.distanceDrivenKm !== null) {
       distanceKm += consumption.distanceDrivenKm
@@ -139,6 +143,8 @@ function totals(entries: Entry[]): FuelTotals {
     count: entries.length,
     totalLiters: round(totalLiters, 3),
     totalCost: round(totalCost, 2),
+    totalReimbursed: round(totalReimbursed, 2),
+    netCost: round(Math.max(0, totalCost - totalReimbursed), 2),
     averagePricePerLiter:
       totalLiters > 0 ? round(totalCost / totalLiters, 3) : null,
     distanceKm,

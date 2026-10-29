@@ -17,6 +17,9 @@ export interface FuelLog {
   liters: number
   pricePerLiter: number
   totalCost: number
+  reimbursedAmount: number
+  sharedWith: string | null
+  netCost: number
   isFullTank: boolean
   gasStationName: string | null
   paymentMethod: PaymentMethod | null
@@ -37,6 +40,8 @@ export interface CreateFuelLogDTO {
   liters: number
   pricePerLiter: number
   totalCost?: number
+  reimbursedAmount?: number | null
+  sharedWith?: string | null
   isFullTank?: boolean
   gasStationName?: string | null
   paymentMethod?: PaymentMethod | null
@@ -67,6 +72,8 @@ export interface FuelTotals {
   count: number
   totalLiters: number
   totalCost: number
+  totalReimbursed: number
+  netCost: number
   averagePricePerLiter: number | null
   distanceKm: number
   consumptionKmPerLiter: number | null

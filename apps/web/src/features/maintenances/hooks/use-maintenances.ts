@@ -1,23 +1,30 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { ANALYTICS_QUERY_KEY } from '@/features/dashboard/hooks/use-analytics'
 import { SCHEDULES_QUERY_KEY } from '@/features/schedules/hooks/use-schedules'
 import { VEHICLES_QUERY_KEY } from '@/features/vehicles/hooks/use-vehicles'
 import { queryClient } from '@/shared/providers/query-client'
 
 import {
   createMaintenance,
+  createMaintenanceTask,
   deleteMaintenance,
+  deleteMaintenanceTask,
   getMaintenanceInvoiceUrl,
   listActiveWarranties,
+  listMaintenanceTasks,
   listMaintenances,
   updateMaintenance,
+  updateMaintenanceTask,
   uploadMaintenanceInvoice
 } from '../api'
 import type {
   CreateMaintenanceDTO,
+  CreateMaintenanceTaskDTO,
   ListMaintenancesParams,
-  UpdateMaintenanceDTO
+  UpdateMaintenanceDTO,
+  UpdateMaintenanceTaskDTO
 } from '../api/types'
 
 export const MAINTENANCES_QUERY_KEY = 'maintenances'
@@ -27,6 +34,7 @@ function invalidateAfterWrite() {
   queryClient.invalidateQueries({ queryKey: [MAINTENANCES_QUERY_KEY] })
   queryClient.invalidateQueries({ queryKey: [SCHEDULES_QUERY_KEY] })
   queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
+  queryClient.invalidateQueries({ queryKey: [ANALYTICS_QUERY_KEY] })
 }
 
 export function useMaintenances(
@@ -46,6 +54,64 @@ export function useActiveWarranties(vehicleId?: string) {
     queryKey: [MAINTENANCES_QUERY_KEY, 'warranties', vehicleId],
     queryFn: () => listActiveWarranties({ vehicleId }),
     enabled: !!vehicleId
+  })
+}
+
+export function useMaintenanceTasks(vehicleId?: string) {
+  return useQuery({
+    queryKey: [MAINTENANCES_QUERY_KEY, 'tasks', vehicleId],
+    queryFn: () => listMaintenanceTasks({ vehicleId }),
+    enabled: !!vehicleId
+  })
+}
+
+export function useCreateMaintenanceTask() {
+  return useMutation({
+    mutationFn: (dto: CreateMaintenanceTaskDTO) => createMaintenanceTask(dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [MAINTENANCES_QUERY_KEY, 'tasks']
+      })
+      toast.success('Pendência adicionada!')
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erro ao adicionar pendência')
+    }
+  })
+}
+
+export function useUpdateMaintenanceTask() {
+  return useMutation({
+    mutationFn: ({
+      id,
+      dto
+    }: {
+      id: string
+      dto: UpdateMaintenanceTaskDTO
+    }) => updateMaintenanceTask(id, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [MAINTENANCES_QUERY_KEY, 'tasks']
+      })
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erro ao atualizar pendência')
+    }
+  })
+}
+
+export function useDeleteMaintenanceTask() {
+  return useMutation({
+    mutationFn: (id: string) => deleteMaintenanceTask(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [MAINTENANCES_QUERY_KEY, 'tasks']
+      })
+      toast.success('Pendência removida!')
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erro ao remover pendência')
+    }
   })
 }
 

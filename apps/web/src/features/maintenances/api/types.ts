@@ -102,3 +102,35 @@ export interface InvoiceUrl {
   url: string
   expiresIn: number
 }
+
+export const MAINTENANCE_TASK_PRIORITIES = ['NEXT_VISIT', 'FUTURE'] as const
+
+export type MaintenanceTaskPriority =
+  (typeof MAINTENANCE_TASK_PRIORITIES)[number]
+
+export interface MaintenanceTask {
+  id: string
+  vehicleId: string
+  title: string
+  priority: MaintenanceTaskPriority
+  targetYear: number | null
+  notes: string | null
+  isCompleted: boolean
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateMaintenanceTaskDTO {
+  vehicleId: string
+  title: string
+  priority?: MaintenanceTaskPriority
+  targetYear?: number | null
+  notes?: string | null
+}
+
+export type UpdateMaintenanceTaskDTO = Partial<
+  Omit<CreateMaintenanceTaskDTO, 'vehicleId'>
+> & {
+  isCompleted?: boolean
+}

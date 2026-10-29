@@ -3,6 +3,8 @@ import type { FuelLog } from '@/features/fuel-logs/api/types'
 import type { Maintenance } from '@/features/maintenances/api/types'
 import { MONTH_NAMES } from '@/shared/utils/month-names'
 
+import type { MonthlyCostBucket } from '../api/types'
+
 export const COST_SERIES = [
   { key: 'fuel', label: 'Combustível', color: 'var(--series-1)' },
   { key: 'road', label: 'Pedágio e estacionamento', color: 'var(--series-2)' },
@@ -33,6 +35,24 @@ export type MonthlyCost = { month: string; total: number } & Record<
 /** Mês (0-11) de uma data de calendário, que chega como 00:00 UTC */
 function monthOf(date: string) {
   return new Date(date).getUTCMonth()
+}
+
+/** Converte os buckets mensais do endpoint `/analytics/monthly-costs` para o formato do gráfico */
+export function toMonthlyCostSeries(
+  buckets: MonthlyCostBucket[]
+): MonthlyCost[] {
+  return MONTH_NAMES.map((name, index) => {
+    const bucket = buckets[index]
+    return {
+      month: name.slice(0, 3),
+      total: bucket?.total ?? 0,
+      fuel: bucket?.fuel ?? 0,
+      road: bucket?.road ?? 0,
+      taxes: bucket?.taxes ?? 0,
+      other: bucket?.other ?? 0,
+      maintenance: bucket?.maintenance ?? 0
+    }
+  })
 }
 
 /** Custos de cada mês do ano por série, com as datas já filtradas pelo ano */

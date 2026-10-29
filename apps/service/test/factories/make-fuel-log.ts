@@ -44,6 +44,8 @@ export function makeFuelLog(override: Partial<FuelLogProps> = {}): FuelLog {
     liters,
     pricePerLiter,
     totalCost: Math.round(liters * pricePerLiter * 100) / 100,
+    reimbursedAmount: 0,
+    sharedWith: null,
     isFullTank: true,
     gasStationName: null,
     paymentMethod: null,

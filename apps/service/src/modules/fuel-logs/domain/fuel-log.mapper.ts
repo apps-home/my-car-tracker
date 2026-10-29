@@ -1,6 +1,8 @@
 import type { FuelLog, FuelLogProps } from './fuel-log.entity'
 
-export type FuelLogHTTP = Omit<FuelLogProps, 'userId'>
+export type FuelLogHTTP = Omit<Required<FuelLogProps>, 'userId'> & {
+  netCost: number
+}
 
 export class FuelLogMapper {
   static toHTTP(fuelLog: FuelLog): FuelLogHTTP {
@@ -13,6 +15,9 @@ export class FuelLogMapper {
       liters: fuelLog.liters,
       pricePerLiter: fuelLog.pricePerLiter,
       totalCost: fuelLog.totalCost,
+      reimbursedAmount: fuelLog.reimbursedAmount,
+      sharedWith: fuelLog.sharedWith,
+      netCost: fuelLog.netCost,
       isFullTank: fuelLog.isFullTank,
       gasStationName: fuelLog.gasStationName,
       paymentMethod: fuelLog.paymentMethod,

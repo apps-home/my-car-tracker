@@ -20,6 +20,8 @@ export interface FuelLogProps {
   liters: number
   pricePerLiter: number
   totalCost: number
+  reimbursedAmount?: number
+  sharedWith?: string | null
   isFullTank: boolean
   gasStationName: string | null
   paymentMethod: PaymentMethod | null
@@ -37,14 +39,20 @@ export type UpdateFuelLogProps = Partial<
   Omit<
     FuelLogProps,
     'id' | 'vehicleId' | 'userId' | 'createdAt' | 'updatedAt' | DerivedField
-  >
+  > & {
+    reimbursedAmount?: number | null
+  }
 >
 
 export class FuelLog {
-  private _props: FuelLogProps
+  private _props: Required<FuelLogProps>
 
   constructor(props: FuelLogProps) {
-    this._props = props
+    this._props = {
+      ...props,
+      reimbursedAmount: props.reimbursedAmount ?? 0,
+      sharedWith: props.sharedWith ?? null
+    }
   }
 
   static create(userId: string, data: CreateFuelLogPayload): FuelLog {
@@ -61,6 +69,8 @@ export class FuelLog {
         liters: data.liters,
         pricePerLiter: data.pricePerLiter,
         totalCost: data.totalCost ?? data.liters * data.pricePerLiter,
+        reimbursedAmount: data.reimbursedAmount ?? 0,
+        sharedWith: data.sharedWith ?? null,
         isFullTank: data.isFullTank ?? true,
         gasStationName: data.gasStationName ?? null,
         paymentMethod: data.paymentMethod ?? null,
@@ -80,7 +90,14 @@ export class FuelLog {
    */
   update(data: UpdateFuelLogProps): void {
     const changes = omitUndefined(data)
-    const next = { ...this._props, ...changes }
+    const next = {
+      ...this._props,
+      ...changes,
+      reimbursedAmount:
+        changes.reimbursedAmount === null
+          ? 0
+          : (changes.reimbursedAmount ?? this._props.reimbursedAmount)
+    }
 
     if (
       changes.totalCost === undefined &&
@@ -112,7 +129,7 @@ export class FuelLog {
     return changed
   }
 
-  private static normalize(props: FuelLogProps): FuelLogProps {
+  private static normalize(props: FuelLogProps): Required<FuelLogProps> {
     if (!(props.date instanceof Date) || Number.isNaN(props.date.getTime())) {
       throw new PayloadError('date must be a valid date')
     }
@@ -139,6 +156,17 @@ export class FuelLog {
     const liters = positive(props.liters, 3, 'liters')
     const pricePerLiter = positive(props.pricePerLiter, 3, 'pricePerLiter')
     const totalCost = positive(props.totalCost, 2, 'totalCost')
+    const rawReimbursed = props.reimbursedAmount ?? 0
+
+    if (!Number.isFinite(rawReimbursed) || round(rawReimbursed, 2) < 0) {
+      throw new PayloadError('reimbursedAmount must not be negative')
+    }
+
+    const reimbursedAmount = round(rawReimbursed, 2)
+
+    if (reimbursedAmount > totalCost) {
+      throw new PayloadError('reimbursedAmount must not exceed totalCost')
+    }
 
     if (typeof props.isFullTank !== 'boolean') {
       throw new PayloadError('isFullTank must be a boolean')
@@ -150,6 +178,8 @@ export class FuelLog {
       liters,
       pricePerLiter,
       totalCost,
+      reimbursedAmount,
+      sharedWith: props.sharedWith?.trim() || null,
       gasStationName: props.gasStationName?.trim() || null,
       notes: props.notes?.trim() || null
     }
@@ -189,6 +219,22 @@ export class FuelLog {
 
   get totalCost(): number {
     return this._props.totalCost
+  }
+
+  get reimbursedAmount(): number {
+    return this._props.reimbursedAmount
+  }
+
+  get sharedWith(): string | null {
+    return this._props.sharedWith
+  }
+
+  /** Valor líquido que saiu do bolso do usuário (`totalCost - reimbursedAmount`) */
+  get netCost(): number {
+    return round(
+      Math.max(0, this._props.totalCost - this._props.reimbursedAmount),
+      2
+    )
   }
 
   get isFullTank(): boolean {

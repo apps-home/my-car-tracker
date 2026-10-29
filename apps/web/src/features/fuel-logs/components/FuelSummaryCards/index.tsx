@@ -35,7 +35,11 @@ export function FuelSummaryCards({
         icon={Wallet}
         label="Gasto com combustível"
         value={formatCurrency(summary.totalCost)}
-        hint={`${summary.count} abastecimento${summary.count === 1 ? '' : 's'}`}
+        hint={
+          summary.totalReimbursed > 0
+            ? `Seu bolso: ${formatCurrency(summary.netCost)} (ajuda ${formatCurrency(summary.totalReimbursed)})`
+            : `${summary.count} abastecimento${summary.count === 1 ? '' : 's'}`
+        }
       />
       <StatCard
         icon={Gauge}

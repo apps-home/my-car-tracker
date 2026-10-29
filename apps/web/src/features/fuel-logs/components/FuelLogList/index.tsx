@@ -42,12 +42,20 @@ export function FuelLogList({ fuelLogs, onEdit, onDelete }: FuelLogListProps) {
               {!fuelLog.isFullTank && (
                 <Badge variant="secondary">Parcial</Badge>
               )}
+              {fuelLog.reimbursedAmount > 0 && (
+                <Badge variant="secondary">
+                  Ajuda {formatCurrency(fuelLog.reimbursedAmount)}
+                  {fuelLog.sharedWith ? ` (${fuelLog.sharedWith})` : ''} · Seu
+                  bolso: {formatCurrency(fuelLog.netCost)}
+                </Badge>
+              )}
             </div>
             <p className="text-muted-foreground text-xs">
               {formatDate(fuelLog.date)} · {formatKm(fuelLog.odometerKm)} ·{' '}
               {formatDecimal(fuelLog.liters, 2)} L a{' '}
               {formatCurrency(fuelLog.pricePerLiter)}
               {fuelLog.gasStationName && ` · ${fuelLog.gasStationName}`}
+              {fuelLog.notes && ` · ${fuelLog.notes}`}
             </p>
           </div>
           <div className="flex flex-col items-end gap-0.5 text-right">

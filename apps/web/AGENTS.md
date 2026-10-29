@@ -71,7 +71,7 @@ The shadcn components live in the shared package `@lib/ui` (`packages/lib-ui`), 
 ```
 src/
 ├── app/              # Next.js App Router pages and layouts
-├── features/         # Feature modules (profile, notifications, vehicles, fuel-logs, expenses, dashboard; maintenances and schedules come next)
+├── features/         # Feature modules (profile, notifications, vehicles, fuel-logs, expenses, maintenances, schedules, dashboard)
 ├── infrastructure/   # Infrastructure layer
 │   ├── api/          # API client configuration
 │   └── services/     # External services integration
@@ -105,11 +105,11 @@ features/<feature>/
 ## Car Tracker Conventions
 
 - **Active vehicle:** `useActiveVehicle()` (`features/vehicles/hooks/use-active-vehicle.ts`) returns the vehicle chosen in the header `VehicleSelector`, kept in `localStorage` (falls back to the first active vehicle). Pages and forms work on this vehicle.
-- **Quick entry:** `QuickActions` (floating `+` button in the `(application)` layout) opens `FuelLogFormDialog` or `ExpenseFormDialog`. Forms use `ResponsiveDialog` (bottom `Sheet` on mobile, `Dialog` on desktop). Pages open their create form with `?new=1` (nuqs), used by the manifest shortcuts.
+- **Quick entry:** `QuickActions` (floating `+` button in the `(application)` layout) opens `FuelLogFormDialog`, `ExpenseFormDialog` or `MaintenanceFormDialog`. Forms use `ResponsiveDialog` (bottom `Sheet` on mobile, `Dialog` on desktop). Pages open their create form with `?new=1` (nuqs), used by the manifest shortcuts.
 - **Dates:** send calendar days as `YYYY-MM-DD` (`todayDateInputValue()` for the user's local today) and display them with `formatDate` (UTC).
 - **Numbers typed by the user:** `parseDecimal` (accepts `5,899` and `5.899`) for liters/price; `formatCurrencyInput` + `parseValue` for R$ amounts.
-- **Invalidation:** fuel log and expense mutations also invalidate `VEHICLES_QUERY_KEY`, since they may raise the odometer.
-- **Chart colors:** cost series use `--series-1..4` from `src/index.css` (categorical palette validated for color blindness, with dark-mode steps). Keep the fixed order: fuel, toll/parking, taxes/insurance, other.
+- **Invalidation:** fuel log, expense and maintenance mutations also invalidate `VEHICLES_QUERY_KEY`, `SCHEDULES_QUERY_KEY` and `ANALYTICS_QUERY_KEY`, since they may raise the odometer, renew preventive schedules or update TCO totals.
+- **Chart colors:** cost series use `--series-1..5` from `src/index.css` (categorical palette validated for color blindness, with dark-mode steps). Keep the fixed order: fuel, toll/parking, taxes/insurance, other, maintenance.
 - **404s:** `api-client` redirects every 404 to `/not-found`, so only call by-id endpoints with ids that came from a list.
 
 ## State Management (Zustand)

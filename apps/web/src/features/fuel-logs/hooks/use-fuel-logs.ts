@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { ANALYTICS_QUERY_KEY } from '@/features/dashboard/hooks/use-analytics'
 import { SCHEDULES_QUERY_KEY } from '@/features/schedules/hooks/use-schedules'
 import { VEHICLES_QUERY_KEY } from '@/features/vehicles/hooks/use-vehicles'
 import { queryClient } from '@/shared/providers/query-client'
@@ -26,6 +27,7 @@ function invalidateAfterWrite() {
   queryClient.invalidateQueries({ queryKey: [FUEL_LOGS_QUERY_KEY] })
   queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
   queryClient.invalidateQueries({ queryKey: [SCHEDULES_QUERY_KEY] })
+  queryClient.invalidateQueries({ queryKey: [ANALYTICS_QUERY_KEY] })
 }
 
 export function useFuelLogs(params?: ListFuelLogsParams, enabled = true) {

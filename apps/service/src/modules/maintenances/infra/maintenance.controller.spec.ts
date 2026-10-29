@@ -9,12 +9,16 @@ import { left, right } from '@/core/utils/Either'
 
 import { InvoiceNotFoundError } from '../application/errors/invoice-not-found.error'
 import { CreateMaintenanceUseCase } from '../application/use-cases/create-maintenance'
+import { CreateMaintenanceTaskUseCase } from '../application/use-cases/create-maintenance-task'
 import { DeleteMaintenanceUseCase } from '../application/use-cases/delete-maintenance'
+import { DeleteMaintenanceTaskUseCase } from '../application/use-cases/delete-maintenance-task'
 import { FindMaintenanceByIdUseCase } from '../application/use-cases/find-maintenance'
 import { GetInvoiceUrlUseCase } from '../application/use-cases/get-invoice-url'
 import { ListActiveWarrantiesUseCase } from '../application/use-cases/list-active-warranties'
+import { ListMaintenanceTasksUseCase } from '../application/use-cases/list-maintenance-tasks'
 import { ListMaintenancesUseCase } from '../application/use-cases/list-maintenances'
 import { UpdateMaintenanceUseCase } from '../application/use-cases/update-maintenance'
+import { UpdateMaintenanceTaskUseCase } from '../application/use-cases/update-maintenance-task'
 import { UploadInvoiceUseCase } from '../application/use-cases/upload-invoice'
 import {
   isInvoiceMimeType,
@@ -41,7 +45,11 @@ describe('MaintenanceController', () => {
         { provide: UpdateMaintenanceUseCase, useValue: noop },
         { provide: DeleteMaintenanceUseCase, useValue: noop },
         { provide: UploadInvoiceUseCase, useValue: uploadInvoice },
-        { provide: GetInvoiceUrlUseCase, useValue: getInvoiceUrl }
+        { provide: GetInvoiceUrlUseCase, useValue: getInvoiceUrl },
+        { provide: CreateMaintenanceTaskUseCase, useValue: noop },
+        { provide: ListMaintenanceTasksUseCase, useValue: noop },
+        { provide: UpdateMaintenanceTaskUseCase, useValue: noop },
+        { provide: DeleteMaintenanceTaskUseCase, useValue: noop }
       ]
     }).compile()
 

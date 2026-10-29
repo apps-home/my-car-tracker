@@ -151,6 +151,10 @@ function FuelLogForm({
   // Qual dos dois o usuário digitou por último decide o que é calculado
   const [lastEdited, setLastEdited] = useState<'liters' | 'total'>('liters')
   const [isFullTank, setIsFullTank] = useState(fuelLog?.isFullTank ?? true)
+  const [reimbursed, setReimbursed] = useState(
+    fuelLog?.reimbursedAmount ? toDecimalInput(fuelLog.reimbursedAmount, 2) : ''
+  )
+  const [sharedWith, setSharedWith] = useState(fuelLog?.sharedWith ?? '')
   const [gasStationName, setGasStationName] = useState(
     fuelLog?.gasStationName ?? ''
   )
@@ -211,6 +215,7 @@ function FuelLogForm({
     const litersValue = parseDecimal(liters)
     const priceValue = parseDecimal(price)
     const totalValue = parseDecimal(total)
+    const reimbursedValue = parseDecimal(reimbursed) ?? 0
 
     if (!date) {
       toast.error('Informe a data')
@@ -234,16 +239,25 @@ function FuelLogForm({
       return
     }
 
+    const computedTotal =
+      totalValue && totalValue > 0
+        ? round(totalValue, 2)
+        : round(litersValue * priceValue, 2)
+
+    if (reimbursedValue < 0 || reimbursedValue > computedTotal) {
+      toast.error('O valor de ajuda não pode ser maior que o total abastecido')
+      return
+    }
+
     const dto = {
       date,
       odometerKm: odometer,
       fuelType,
       liters: round(litersValue, 3),
       pricePerLiter: round(priceValue, 3),
-      totalCost:
-        totalValue && totalValue > 0
-          ? round(totalValue, 2)
-          : round(litersValue * priceValue, 2),
+      totalCost: computedTotal,
+      reimbursedAmount: reimbursedValue > 0 ? round(reimbursedValue, 2) : 0,
+      sharedWith: sharedWith.trim() || null,
       isFullTank,
       gasStationName: gasStationName.trim() || null,
       paymentMethod:
@@ -264,6 +278,9 @@ function FuelLogForm({
   }
 
   const totalPreview = parseDecimal(total)
+  const reimbursedPreview = parseDecimal(reimbursed) ?? 0
+  const netPreview =
+    totalPreview != null ? Math.max(0, totalPreview - reimbursedPreview) : null
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
@@ -353,6 +370,31 @@ function FuelLogForm({
           onChange={setPaymentMethod}
           options={PAYMENT_OPTIONS}
           className="sm:w-full"
+        />
+      </FormField>
+      <FormField
+        id="fuel-reimbursed"
+        label="Ajuda / divisão (R$)"
+        hint={
+          reimbursedPreview > 0 && netPreview != null
+            ? `Do seu bolso: ${formatCurrency(netPreview)}`
+            : 'Opcional'
+        }
+      >
+        <Input
+          id="fuel-reimbursed"
+          inputMode="decimal"
+          placeholder="0,00"
+          value={reimbursed}
+          onChange={(e) => setReimbursed(e.target.value)}
+        />
+      </FormField>
+      <FormField id="fuel-shared-with" label="Quem ajudou">
+        <Input
+          id="fuel-shared-with"
+          placeholder="Ex.: Pai, Mãe, Annalik"
+          value={sharedWith}
+          onChange={(e) => setSharedWith(e.target.value)}
         />
       </FormField>
       <p className="col-span-2 text-[11px] text-muted-foreground">
