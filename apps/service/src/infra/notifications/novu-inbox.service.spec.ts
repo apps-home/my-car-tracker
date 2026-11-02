@@ -29,9 +29,9 @@ describe('NovuInboxService', () => {
     expect(session).toEqual({
       enabled: true,
       applicationIdentifier: 'app',
-      subscriberId: 'user-1',
+      subscriberId: 'my-car-tracker:user-1',
       subscriberHash: createHmac('sha256', 'secret')
-        .update('user-1')
+        .update('my-car-tracker:user-1')
         .digest('hex'),
       apiUrl: 'https://eu.api.novu.co',
       socketUrl: null

@@ -27,7 +27,7 @@ describe('NovuNotifier', () => {
     expect(result).toBe('sent')
     expect(trigger).toHaveBeenCalledWith({
       workflowId: 'maintenance-due',
-      to: { subscriberId: 'user-1' },
+      to: { subscriberId: 'my-car-tracker:user-1' },
       payload: { title: 'Troca de óleo' },
       transactionId: 'maintenance-due-1-1'
     })

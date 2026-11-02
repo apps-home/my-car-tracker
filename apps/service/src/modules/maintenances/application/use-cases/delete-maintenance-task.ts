@@ -9,17 +9,16 @@ type Response = Either<MaintenanceTaskNotFoundError, void>
 
 @Injectable()
 export class DeleteMaintenanceTaskUseCase {
-	constructor(private taskRepository: MaintenanceTaskRepository) {}
+  constructor(private taskRepository: MaintenanceTaskRepository) {}
 
-	async execute(userId: string, id: string): Promise<Response> {
-		const task = await this.taskRepository.findById(id, userId)
+  async execute(userId: string, id: string): Promise<Response> {
+    const task = await this.taskRepository.findById(id, userId)
 
-		if (!task) {
-			return left(new MaintenanceTaskNotFoundError())
-		}
+    if (!task) {
+      return left(new MaintenanceTaskNotFoundError())
+    }
 
-		await this.taskRepository.delete(task)
-		return right(void 0)
-	}
+    await this.taskRepository.delete(task)
+    return right(void 0)
+  }
 }
-

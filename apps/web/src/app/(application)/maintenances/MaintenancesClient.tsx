@@ -21,8 +21,8 @@ import { WarrantiesCard } from '@/features/maintenances/components/WarrantiesCar
 import {
   useActiveWarranties,
   useDeleteMaintenance,
-  useMaintenanceTasks,
-  useMaintenances
+  useMaintenances,
+  useMaintenanceTasks
 } from '@/features/maintenances/hooks/use-maintenances'
 import { MAINTENANCE_TYPE_LABELS } from '@/features/maintenances/utils/maintenance-labels'
 import { useActiveVehicle } from '@/features/vehicles/hooks/use-active-vehicle'

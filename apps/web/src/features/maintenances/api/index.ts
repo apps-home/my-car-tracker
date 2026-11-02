@@ -84,10 +84,9 @@ export async function listMaintenanceTasks(params?: {
   vehicleId?: string
   includeCompleted?: boolean
 }): Promise<MaintenanceTask[]> {
-  const response = await apiClient.get<MaintenanceTask[]>(
-    `${BASE_URL}/tasks`,
-    { params }
-  )
+  const response = await apiClient.get<MaintenanceTask[]>(`${BASE_URL}/tasks`, {
+    params
+  })
   return response.data
 }
 

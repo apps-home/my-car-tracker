@@ -16,41 +16,40 @@ type Response = Either<VehicleNotFoundError, MonthlyCostsSummary>
 
 @Injectable()
 export class GetMonthlyCostsUseCase {
-	constructor(
-		private vehicleRepository: VehicleRepository,
-		private fuelLogRepository: FuelLogRepository,
-		private expenseRepository: ExpenseRepository,
-		private maintenanceRepository: MaintenanceRepository
-	) {}
+  constructor(
+    private vehicleRepository: VehicleRepository,
+    private fuelLogRepository: FuelLogRepository,
+    private expenseRepository: ExpenseRepository,
+    private maintenanceRepository: MaintenanceRepository
+  ) {}
 
-	async execute({
-		userId,
-		vehicleId,
-		year
-	}: MonthlyCostsParams): Promise<Response> {
-		const vehicle = await this.vehicleRepository.findById(vehicleId, userId)
+  async execute({
+    userId,
+    vehicleId,
+    year
+  }: MonthlyCostsParams): Promise<Response> {
+    const vehicle = await this.vehicleRepository.findById(vehicleId, userId)
 
-		if (!vehicle) {
-			return left(new VehicleNotFoundError())
-		}
+    if (!vehicle) {
+      return left(new VehicleNotFoundError())
+    }
 
-		const targetYear = year ?? todayInTimeZone().getUTCFullYear()
+    const targetYear = year ?? todayInTimeZone().getUTCFullYear()
 
-		const [fuelLogs, expenses, maintenances] = await Promise.all([
-			this.fuelLogRepository.list({ userId, vehicleId, year: targetYear }),
-			this.expenseRepository.list({ userId, vehicleId, year: targetYear }),
-			this.maintenanceRepository.list({ userId, vehicleId, year: targetYear })
-		])
+    const [fuelLogs, expenses, maintenances] = await Promise.all([
+      this.fuelLogRepository.list({ userId, vehicleId, year: targetYear }),
+      this.expenseRepository.list({ userId, vehicleId, year: targetYear }),
+      this.maintenanceRepository.list({ userId, vehicleId, year: targetYear })
+    ])
 
-		return right(
-			calculateMonthlyCosts({
-				vehicleId,
-				year: targetYear,
-				fuelLogs,
-				expenses,
-				maintenances
-			})
-		)
-	}
+    return right(
+      calculateMonthlyCosts({
+        vehicleId,
+        year: targetYear,
+        fuelLogs,
+        expenses,
+        maintenances
+      })
+    )
+  }
 }
-

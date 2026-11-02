@@ -195,7 +195,7 @@ infra/
 
 ### Notificações (Novu)
 
-- `DomainNotifier` (`core/domain/notifications`) é implementado por `NovuNotifier`: `trigger({ workflowId, to: { subscriberId }, payload, transactionId })`, com o `subscriberId` igual ao id do usuário do Better Auth. Nunca lança: sem `NOVU_SECRET_KEY` devolve `skipped`; erro ou workflow inexistente devolve `failed` com log.
+- `DomainNotifier` (`core/domain/notifications`) é implementado por `NovuNotifier`: `trigger({ workflowId, to: { subscriberId }, payload, transactionId })`, com o `subscriberId` no Novu prefixado como `my-car-tracker:<userId>` (`toSubscriberId`). Nunca lança: sem `NOVU_SECRET_KEY` devolve `skipped`; erro ou workflow inexistente devolve `failed` com log.
 - Os workflows ficam em `NOTIFICATION_WORKFLOWS`. O primeiro previsto é `maintenance-due` (plano preventivo próximo do vencimento ou vencido), que precisa ser criado no Novu com esse identificador.
 - `GET /notifications/inbox-session` devolve `applicationIdentifier`, `subscriberId`, `subscriberHash` (HMAC-SHA256) e as URLs da região EU, ou `{ enabled: false }`. A web mostra o `<Inbox>` no header só quando `enabled`.
 - Variáveis (opcionais; vazio = desligado): `NOVU_SECRET_KEY`, `NOVU_APPLICATION_IDENTIFIER`, `NOVU_API_URL`, `NOVU_SOCKET_URL`.

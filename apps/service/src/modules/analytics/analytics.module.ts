@@ -9,9 +9,8 @@ import { GetMonthlyCostsUseCase } from './application/use-cases/get-monthly-cost
 import { AnalyticsController } from './infra/analytics.controller'
 
 @Module({
-	imports: [VehicleModule, FuelLogModule, ExpenseModule, MaintenanceModule],
-	controllers: [AnalyticsController],
-	providers: [GetAnalyticsOverviewUseCase, GetMonthlyCostsUseCase]
+  imports: [VehicleModule, FuelLogModule, ExpenseModule, MaintenanceModule],
+  controllers: [AnalyticsController],
+  providers: [GetAnalyticsOverviewUseCase, GetMonthlyCostsUseCase]
 })
 export class AnalyticsModule {}
-

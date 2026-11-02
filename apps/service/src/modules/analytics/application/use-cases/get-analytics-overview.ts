@@ -16,41 +16,40 @@ type Response = Either<VehicleNotFoundError, AnalyticsOverview>
 
 @Injectable()
 export class GetAnalyticsOverviewUseCase {
-	constructor(
-		private vehicleRepository: VehicleRepository,
-		private fuelLogRepository: FuelLogRepository,
-		private expenseRepository: ExpenseRepository,
-		private maintenanceRepository: MaintenanceRepository
-	) {}
+  constructor(
+    private vehicleRepository: VehicleRepository,
+    private fuelLogRepository: FuelLogRepository,
+    private expenseRepository: ExpenseRepository,
+    private maintenanceRepository: MaintenanceRepository
+  ) {}
 
-	async execute({
-		userId,
-		vehicleId,
-		...period
-	}: AnalyticsOverviewParams): Promise<Response> {
-		const vehicle = await this.vehicleRepository.findById(vehicleId, userId)
+  async execute({
+    userId,
+    vehicleId,
+    ...period
+  }: AnalyticsOverviewParams): Promise<Response> {
+    const vehicle = await this.vehicleRepository.findById(vehicleId, userId)
 
-		if (!vehicle) {
-			return left(new VehicleNotFoundError())
-		}
+    if (!vehicle) {
+      return left(new VehicleNotFoundError())
+    }
 
-		const [allFuelLogs, allExpenses, allMaintenances] = await Promise.all([
-			this.fuelLogRepository.findAllByVehicle(vehicleId, userId),
-			this.expenseRepository.list({ userId, vehicleId }),
-			this.maintenanceRepository.list({ userId, vehicleId })
-		])
+    const [allFuelLogs, allExpenses, allMaintenances] = await Promise.all([
+      this.fuelLogRepository.findAllByVehicle(vehicleId, userId),
+      this.expenseRepository.list({ userId, vehicleId }),
+      this.maintenanceRepository.list({ userId, vehicleId })
+    ])
 
-		const range = toDateRange(period)
+    const range = toDateRange(period)
 
-		return right(
-			calculateAnalyticsOverview({
-				vehicle,
-				allFuelLogs,
-				allExpenses,
-				allMaintenances,
-				range
-			})
-		)
-	}
+    return right(
+      calculateAnalyticsOverview({
+        vehicle,
+        allFuelLogs,
+        allExpenses,
+        allMaintenances,
+        range
+      })
+    )
+  }
 }
-

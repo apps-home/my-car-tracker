@@ -13,8 +13,8 @@ import {
   deleteMaintenanceTask,
   getMaintenanceInvoiceUrl,
   listActiveWarranties,
-  listMaintenanceTasks,
   listMaintenances,
+  listMaintenanceTasks,
   updateMaintenance,
   updateMaintenanceTask,
   uploadMaintenanceInvoice
@@ -82,13 +82,8 @@ export function useCreateMaintenanceTask() {
 
 export function useUpdateMaintenanceTask() {
   return useMutation({
-    mutationFn: ({
-      id,
-      dto
-    }: {
-      id: string
-      dto: UpdateMaintenanceTaskDTO
-    }) => updateMaintenanceTask(id, dto),
+    mutationFn: ({ id, dto }: { id: string; dto: UpdateMaintenanceTaskDTO }) =>
+      updateMaintenanceTask(id, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [MAINTENANCES_QUERY_KEY, 'tasks']

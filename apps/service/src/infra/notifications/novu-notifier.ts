@@ -7,7 +7,7 @@ import {
   type NotificationResult
 } from '@/core/domain/notifications/domain-notifier.interface'
 
-import { NOVU_CLIENT } from './novu.client'
+import { NOVU_CLIENT, toSubscriberId } from './novu.client'
 
 /**
  * Dispara workflows do Novu. Sem `NOVU_SECRET_KEY` vira no-op (`skipped`);
@@ -25,9 +25,11 @@ export class NovuNotifier implements DomainNotifier {
     payload,
     transactionId
   }: NotificationRequest<TPayload>): Promise<NotificationResult> {
+    const subscriberId = toSubscriberId(to.subscriberId)
+
     if (!this.novu) {
       this.logger.log(
-        `Notifications disabled (NOVU_SECRET_KEY not set). Skipping "${workflow}" to ${to.subscriberId}.`
+        `Notifications disabled (NOVU_SECRET_KEY not set). Skipping "${workflow}" to ${subscriberId}.`
       )
       return 'skipped'
     }
@@ -36,7 +38,7 @@ export class NovuNotifier implements DomainNotifier {
       const { result } = await this.novu.trigger({
         workflowId: workflow,
         to: {
-          subscriberId: to.subscriberId,
+          subscriberId,
           ...(to.email && { email: to.email }),
           ...(to.name && { firstName: to.name })
         },
@@ -55,7 +57,7 @@ export class NovuNotifier implements DomainNotifier {
       return 'sent'
     } catch (error) {
       this.logger.error(
-        `Failed to send "${workflow}" to ${to.subscriberId}`,
+        `Failed to send "${workflow}" to ${subscriberId}`,
         error instanceof Error ? error.stack : error
       )
       return 'failed'
