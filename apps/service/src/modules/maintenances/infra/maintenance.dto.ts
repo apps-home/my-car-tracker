@@ -171,6 +171,18 @@ export class CreateMaintenanceTaskDTO {
   targetYear?: number | null
 
   @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(12)
+  targetMonth?: number | null
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(3650)
+  intervalDays?: number | null
+
+  @IsOptional()
   @IsString()
   @MaxLength(1000)
   notes?: string | null
@@ -182,6 +194,10 @@ export class UpdateMaintenanceTaskDTO extends PartialType(
   @IsOptional()
   @IsBoolean()
   isCompleted?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  markAsDone?: boolean
 }
 
 export class ListMaintenanceTasksQueryDTO {

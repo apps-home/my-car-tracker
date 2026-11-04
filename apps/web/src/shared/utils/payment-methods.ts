@@ -3,7 +3,8 @@ export const PAYMENT_METHODS = [
   'PIX',
   'CREDIT_CARD',
   'DEBIT_CARD',
-  'CASH'
+  'CASH',
+  'MEAL_VOUCHER'
 ] as const
 
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
@@ -13,5 +14,6 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   PIX: 'Pix',
   CREDIT_CARD: 'Cartão de crédito',
   DEBIT_CARD: 'Cartão de débito',
-  CASH: 'Dinheiro'
+  CASH: 'Dinheiro',
+  MEAL_VOUCHER: 'Vale-refeição/alimentação (VR/VA)'
 }

@@ -3,7 +3,8 @@ export const PAYMENT_METHODS = [
   'PIX',
   'CREDIT_CARD',
   'DEBIT_CARD',
-  'CASH'
+  'CASH',
+  'MEAL_VOUCHER'
 ] as const
 
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]

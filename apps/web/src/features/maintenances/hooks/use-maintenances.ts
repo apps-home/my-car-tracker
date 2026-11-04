@@ -23,6 +23,7 @@ import type {
   CreateMaintenanceDTO,
   CreateMaintenanceTaskDTO,
   ListMaintenancesParams,
+  MaintenanceTask,
   UpdateMaintenanceDTO,
   UpdateMaintenanceTaskDTO
 } from '../api/types'
@@ -84,13 +85,38 @@ export function useUpdateMaintenanceTask() {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateMaintenanceTaskDTO }) =>
       updateMaintenanceTask(id, dto),
-    onSuccess: () => {
+    // Atualização otimista: o item muda na hora e volta atrás se a API falhar
+    onMutate: async ({ id, dto }) => {
+      const queryKey = [MAINTENANCES_QUERY_KEY, 'tasks']
+      await queryClient.cancelQueries({ queryKey })
+      const previous = queryClient.getQueriesData<MaintenanceTask[]>({
+        queryKey
+      })
+
+      queryClient.setQueriesData<MaintenanceTask[]>({ queryKey }, (tasks) =>
+        tasks?.map((task) =>
+          task.id === id && dto.isCompleted !== undefined
+            ? {
+                ...task,
+                isCompleted: dto.isCompleted,
+                completedAt: dto.isCompleted ? new Date().toISOString() : null
+              }
+            : task
+        )
+      )
+
+      return { previous }
+    },
+    onError: (error: any, _variables, context) => {
+      for (const [key, data] of context?.previous ?? []) {
+        queryClient.setQueryData(key, data)
+      }
+      toast.error(error.message || 'Erro ao atualizar pendência')
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: [MAINTENANCES_QUERY_KEY, 'tasks']
       })
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Erro ao atualizar pendência')
     }
   })
 }
