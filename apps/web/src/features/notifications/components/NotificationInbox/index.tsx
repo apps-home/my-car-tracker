@@ -24,6 +24,12 @@ const APPEARANCE: InboxProps['appearance'] = {
     colorRing: 'var(--ring)',
     borderRadius: 'var(--radius)',
     fontSize: '0.875rem'
+  },
+  elements: {
+    // 👇 Oculta o botão da engrenagem de preferências
+    preferences__button: {
+      display: 'none'
+    }
   }
 }
 
